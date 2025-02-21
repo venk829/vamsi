@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Movie Ticket Booking</title>
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            margin: 0;
+
+            padding: 0;
+
+            background-color: #f5f5f5;
+
+        }
+
+
+
+        header {
+
+            background-color: #222;
+
+            color: white;
+
+            padding: 15px 20px;
+
+            text-align: center;
+
+            font-size: 24px;
+
+        }
+
+
+
+        .movies, .content, .seats {
+
+            padding: 20px;
+
+            text-align: center;
+
+        }
+
+
+
+        .movie-poster {
+
+            display: inline-block;
+
+            margin: 15px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            box-shadow: 0 0 15px rgb(0, 255, 255);
+
+            transition: transform 0.3s ease;
+
+        }
+
+
+
+        .movie-poster:hover {
+
+            transform: scale(1.1);
+
+        }
+
+
+
+        .movie-poster img {
+
+            width: 150px;
+
+            height: 220px;
+
+            border-radius: 5px;
+
+        }
+
+
+
+        .movie-price {
+
+            font-weight: bold;
+
+            color: #555;
+
+            margin-top: 10px;
+
+        }
+
+
+
+        .page {
+
+            display: none;
+
+        }
+
+
+
+        .page.active {
+
+            display: block;
+
+        }
+
+
+
+        .button {
+
+            padding: 12px 20px;
+
+            background-color: #333;
+
+            color: rgb(255, 128, 0);
+
+            border: none;
+
+            cursor: pointer;
+
+            font-size: 16px;
+
+            margin-top: 10px;
+
+        }
+
+
+
+        .seats {
+
+            display: grid;
+
+            grid-template-columns: repeat(8, 1fr);
+
+            gap: 10px;
+
+            max-width: 500px;
+
+            margin: 20px auto;
+
+        }
+
+
+
+        .seat {
+
+            width: 40px;
+
+            height: 40px;
+
+            background-color: rgb(128, 128, 255);
+
+            border: 1px solid #333;
+
+            text-align: center;
+
+            line-height: 40px;
+
+            cursor: pointer;
+
+            border-radius: 4px;
+
+        }
+
+
+
+        .seat.selected {
+
+            background-color: rgb(0, 255, 255);
+
+        }
+
+
+
+        .seat.occupied {
+
+            background-color: #555;
+
+            pointer-events: none;
+
+        }
+
+
+
+        .seat:hover {
+
+            background-color: #ccc;
+
+        }
+
+
+
+        .movie-image {
+
+            margin: 20px 0;
+
+        }
+
+
+
+        .movie-image img {
+
+            width: 200px;
+
+            height: 300px;
+
+            border-radius: 10px;
+
+        }
+
+
+
+        .summary-table, .price-details {
+
+            width: 80%;
+
+            margin: 20px auto;
+
+            border-collapse: collapse;
+
+        }
+
+
+
+        th, td {
+
+            border: 1px solid #ddd;
+
+            padding: 8px;
+
+            text-align: left;
+
+        }
+
+
+
+        th {
+
+            background-color: #f4f4f4;
+
+        }
+
+
+
+        .center {
+
+            text-align: center;
+
+        }
+
+
+
+        input, select {
+
+            padding: 10px;
+
+            font-size: 16px;
+
+            margin: 10px;
+
+        }
+
+
+
+        @media (max-width: 768px) {
+
+            .seats {
+
+                grid-template-columns: repeat(4, 1fr);
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Home Page -->
+
+    <div id="home-page" class="page active">
+
+        <header>
+
+            <h1>Welcome to Movie Mania!</h1>
+
+        </header>
+
+        <main>
+
+            <div class="movies">
+
+                <h2>Now Showing</h2>
+
+                <div class="movie-poster" onclick="navigateToBooking('Salaar', 'poster1.jpg', 200)">
+
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnFGe2GpMi_EIhBgmjhPkdFknT0dUmxRRP4Q&usqp=CAU" alt="Salaar">
+
+                    <p>Salaar</p>
+
+                    <p class="movie-price">₹200 per ticket</p>
+
+                </div>
+
+                <div class="movie-poster" onclick="navigateToBooking('Animal', 'poster2.jpg', 250)">
+
+                    <img src="https://m.media-amazon.com/images/I/61OmlO9stnL.jpg" alt="Animal">
+
+                    <p>Animal</p>
+
+                    <p class="movie-price">₹250 per ticket</p>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- Booking Page -->
+
+    <div id="booking-page" class="page">
+
+        <header>
+
+            <h1>Book Your Tickets</h1>
+
+        </header>
+
+        <main>
+
+            <h2 id="movie-title">Movie Name</h2>
+
+            <div class="movie-image" id="movie-poster"></div>
+
+
+
+            <label for="show-time">Select Show Time:</label>
+
+            <select id="show-time">
+
+                <option value="10:00 AM">10:00 AM</option>
+
+                <option value="1:00 PM">1:00 PM</option>
+
+                <option value="4:00 PM">4:00 PM</option>
+
+                <option value="7:00 PM">7:00 PM</option>
+
+            </select>
+
+
+
+            <br>
+
+
+
+            <label for="booking-date">Select Date:</label>
+
+            <input type="date" id="booking-date" required>
+
+
+
+            <br><br>
+
+            <h3>Select Your Seats:</h3>
+
+            <div class="seats" id="seat-container"></div>
+
+            <p id="selected-seats"></p>
+
+
+
+            <button class="button" onclick="calculatePrice()">Calculate Price</button>
+
+            <p id="price-details"></p>
+
+            <button id="confirm-button" class="button hidden" onclick="goToPayment()">Proceed to Payment</button>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- Payment Page -->
+
+    <div id="payment-page" class="page">
+
+        <header>
+
+            <h1>Payment Details</h1>
+
+        </header>
+
+        <main>
+
+            <label for="email">Email:</label>
+
+            <input type="email" id="email" placeholder="Enter your email" required><br>
+
+
+
+            <label for="phone">Phone Number:</label>
+
+            <input type="text" id="phone" placeholder="Enter your phone number" required><br>
+
+
+
+            <label for="card-number">Card Number:</label>
+
+            <input type="text" id="card-number" placeholder="Enter your card number" required><br>
+
+
+
+            <label for="pin-code">Pin Code:</label>
+
+            <input type="text" id="pin-code" placeholder="Enter your pin code" required><br>
+
+
+
+            <button class="button" onclick="processPayment()">Pay Now</button>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- Confirmation Page -->
+
+    <div id="confirmation-page" class="page">
+
+        <header>
+
+            <h1>Payment Successful!</h1>
+
+        </header>
+
+        <main>
+
+            <p>Your booking has been confirmed. Here are your payment and booking details:</p>
+
+            <table class="summary-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Details</th>
+
+                        <th>Information</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="summary-table">
+
+                </tbody>
+
+            </table>
+
+            <button class="button" onclick="goHome()">Back to Home</button>
+
+        </main>
+
+    </div>
+
+
+
+    <script>
+
+        let bookingDetails = {};
+
+        let selectedSeats = [];
+
+        let finalPrice = 0;
+
+
+
+        function navigateToBooking(movie, poster, price) {
+
+            document.getElementById('home-page').classList.remove('active');
+
+            document.getElementById('booking-page').classList.add('active');
+
+            document.getElementById('movie-title').innerText = movie;
+
+            bookingDetails.movie = movie;
+
+            bookingDetails.poster = poster;
+
+            bookingDetails.pricePerTicket = price;
+
+            generateSeats();
+
+        }
+
+
+
+        function generateSeats() {
+
+            const seatContainer = document.getElementById('seat-container');
+
+            seatContainer.innerHTML = '';
+
+            for (let i = 1; i <= 40; i++) {
+
+                const seat = document.createElement('div');
+
+                seat.classList.add('seat');
+
+                seat.innerText = i;
+
+                seat.onclick = () => selectSeat(seat, i);
+
+                seatContainer.appendChild(seat);
+
+            }
+
+              }
+
+
+
+        function selectSeat(seat, seatNumber) {
+
+            if (seat.classList.contains('selected')) {
+
+                seat.classList.remove('selected');
+
+                selectedSeats = selectedSeats.filter(s => s !== seatNumber);
+
+            } else {
+
+                seat.classList.add('selected');
+
+                selectedSeats.push(seatNumber);
+
+            }
+
+            document.getElementById('selected-seats').innerText = `Selected Seats: ${selectedSeats.join(', ')}`;
+
+        }
+
+
+
+        function calculatePrice() {
+
+            const date = document.getElementById('booking-date').value;
+
+            const time = document.getElementById('show-time').value;
+
+            if (!date || selectedSeats.length === 0) {
+
+                alert('Please select a valid date and at least one seat!');
+
+                return;
+
+            }
+
+
+
+            const originalPrice = selectedSeats.length * bookingDetails.pricePerTicket;
+
+            let discount = 0;
+
+
+
+            if (selectedSeats.length >= 3) {
+
+                discount = originalPrice * 0.1; // 10% discount for 3 or more tickets
+
+            }
+
+
+
+            finalPrice = originalPrice - discount;
+
+
+
+            document.getElementById('price-details').innerHTML = `
+
+                <p>Original Price: ₹${originalPrice.toFixed(2)}</p>
+
+                <p>Discount (10% for 3 or more tickets): ₹${discount.toFixed(2)}</p>
+
+                <p><strong>Final Price: ₹${finalPrice.toFixed(2)}</strong></p>
+
+            `;
+
+
+
+            bookingDetails = { ...bookingDetails, date, time, seats: selectedSeats, totalPrice: finalPrice, discount };
+
+            document.getElementById('confirm-button').classList.remove('hidden');
+
+        }
+
+
+
+        function goToPayment() {
+
+            document.getElementById('booking-page').classList.remove('active');
+
+            document.getElementById('payment-page').classList.add('active');
+
+        }
+
+
+
+        function processPayment() {
+
+            const email = document.getElementById('email').value;
+
+            const phone = document.getElementById('phone').value;
+
+            const cardNumber = document.getElementById('card-number').value;
+
+            const pinCode = document.getElementById('pin-code').value;
+
+
+
+            if (!email || !phone || !cardNumber || !pinCode) {
+
+                alert('Please fill in all payment details.');
+
+                return;
+
+            }
+
+
+
+            // Add payment confirmation logic here if needed
+
+
+
+            document.getElementById('payment-page').classList.remove('active');
+
+            document.getElementById('confirmation-page').classList.add('active');
+
+
+
+            const summaryTable = document.getElementById('summary-table');
+
+            summaryTable.innerHTML = `
+
+                <tr>
+
+                    <td>Movie</td>
+
+                    <td>${bookingDetails.movie}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Date</td>
+
+                    <td>${bookingDetails.date}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Time</td>
+
+                    <td>${bookingDetails.time}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Selected Seats</td>
+
+                    <td>${bookingDetails.seats.join(', ')}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Original Price</td>
+
+                    <td>₹${(bookingDetails.seats.length * bookingDetails.pricePerTicket).toFixed(2)}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Discount</td>
+
+                    <td>₹${bookingDetails.discount.toFixed(2)}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Total Price Paid</td>
+
+                    <td>₹${bookingDetails.totalPrice.toFixed(2)}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Payment Date</td>
+
+                    <td>${new Date().toLocaleString()}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Transaction ID</td>
+
+                    <td>TXN${Math.floor(Math.random() * 100000000)}</td>
+
+                </tr>
+
+            `;
+
+        }
+
+
+
+        function goHome() {
+
+            location.reload();
+
+        }
+
+    </script>
+
+</body>
+
+</html>
